@@ -1,23 +1,23 @@
 const products = [
     {
         id: 1,
-        title: "Digital Product #1",
-        description: "High-quality digital download",
+        title: "Premium Product #1",
+        description: "High-quality digital product",
         price: 150.00,
         image: "📦"
     },
     {
         id: 2,
-        title: "Digital Product #2",
-        description: "Exclusive content pack",
+        title: "Premium Product #2",
+        description: "Exclusive digital content",
         price: 250.00,
         image: "🎁"
     },
     {
         id: 3,
-        title: "VIP Bundle",
-        description: "All-in-one package",
-        price: 499.00,
+        title: "VIP Bundle Pack",
+        description: "Complete collection — Best Value!",
+        price: 500.00,
         image: "⭐"
     }
 ];

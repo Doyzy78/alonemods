@@ -3,44 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checkout — PayMongo</title>
+    <title>My Shop</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+    <!-- Header -->
     <header>
         <h1>🛒 My Shop</h1>
         <button class="cart-btn" id="cartBtn">🛒 Cart (<span id="cartCount">0</span>)</button>
     </header>
 
+    <!-- Products Section -->
     <main>
-        <h2>Products</h2>
-        <div class="products-grid" id="productsGrid"></div>
+        <h2>Our Products</h2>
+        <div class="products-grid" id="productsGrid">
+            <!-- Products will be loaded HERE from products.js ✅ -->
+        </div>
     </main>
 
     <!-- Cart Modal -->
     <div class="modal" id="cartModal">
         <div class="modal-content">
             <span class="close" id="closeModal">&times;</span>
-            <h2>Checkout</h2>
+            <h2>Your Cart</h2>
             <div id="cartItems"></div>
+            
             <div class="cart-total">
                 <strong>Total: ₱<span id="cartTotal">0.00</span></strong>
             </div>
-            
+
             <!-- Customer Info -->
             <div class="customer-form">
                 <input type="text" id="customerName" placeholder="Your Name" required>
-                <input type="email" id="customerEmail" placeholder="Your Email" required>
+                <input type="email" id="customerEmail" placeholder="Email Address" required>
                 <input type="tel" id="customerPhone" placeholder="Phone Number">
             </div>
 
-            <button class="checkout-btn" id="checkoutBtn">💳 Pay with PayMongo</button>
-            <p class="secure-note">🔒 Secure payment powered by PayMongo</p>
+            <button class="checkout-btn" id="checkoutBtn">💳 Proceed to Payment</button>
+            <p class="secure-note">🔒 Secure Payment via PayMongo</p>
         </div>
     </div>
 
-    <!-- Loading Overlay -->
+    <!-- Loading — ONLY during payment -->
     <div class="loading" id="loading">
         <div class="spinner"></div>
         <p>Creating payment link...</p>
@@ -49,7 +54,8 @@
     <!-- Status Messages -->
     <div class="toast" id="toast"></div>
 
-    <script src="products.js"></script>
+    <!-- ⚠️ IMPORTANT: Order matters! products.js FIRST, then app.js -->
+    <script src="product.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

@@ -1,5 +1,5 @@
 // ============== CONFIGURATION ==============
-const BACKEND_URL = "https://your-backend-url.com"; // ← Your webhook/server URL
+const BACKEND_URL = "https://your-backend-url.com"; // ← Replace with your backend URL
 const CURRENCY = "PHP";
 const SUCCESS_URL = window.location.origin + "/success.html";
 const CANCEL_URL = window.location.href;
@@ -19,7 +19,7 @@ const checkoutBtn = document.getElementById('checkoutBtn');
 const loading = document.getElementById('loading');
 const toast = document.getElementById('toast');
 
-// Initialize
+// ✅ SHOW PRODUCTS FIRST — Load immediately
 renderProducts();
 
 function renderProducts() {
@@ -40,23 +40,30 @@ function renderProducts() {
     });
 }
 
+// ✅ ADD TO CART
 function addToCart(productId) {
     const product = products.find(p => p.id === productId);
     const existing = cart.find(i => i.id === productId);
     
-    if (existing) existing.quantity++;
-    else cart.push({ ...product, quantity: 1 });
+    if (existing) {
+        existing.quantity++;
+    } else {
+        cart.push({ ...product, quantity: 1 });
+    }
     
     updateCartUI();
-    showToast(`${product.title} added! ✅`, 'success');
+    showToast(`${product.title} added to cart! ✅`, 'success');
 }
 
 function updateQuantity(productId, action) {
     const item = cart.find(i => i.id === productId);
-    if (action === 'plus') item.quantity++;
-    else {
+    if (action === 'plus') {
+        item.quantity++;
+    } else {
         item.quantity--;
-        if (item.quantity <= 0) cart = cart.filter(i => i.id !== productId);
+        if (item.quantity <= 0) {
+            cart = cart.filter(i => i.id !== productId);
+        }
     }
     updateCartUI();
 }
@@ -101,60 +108,75 @@ cartBtn.addEventListener('click', () => {
     cartModal.classList.add('active');
     updateCartUI();
 });
-closeModal.addEventListener('click', () => cartModal.classList.remove('active'));
-window.addEventListener('click', e => {
-    if (e.target === cartModal) cartModal.classList.remove('active');
+
+closeModal.addEventListener('click', () => {
+    cartModal.classList.remove('active');
 });
 
-// ✅ PAYMENT CHECKOUT — Create PayMongo Link
+window.addEventListener('click', e => {
+    if (e.target === cartModal) {
+        cartModal.classList.remove('active');
+    }
+});
+
+// ✅ CHECKOUT → SEND TO WEBHOOK
 checkoutBtn.addEventListener('click', async () => {
     if (cart.length === 0) return;
 
     // Get customer info
-    const customerName = document.getElementById('customerName').value || 'Guest Customer';
-    const customerEmail = document.getElementById('customerEmail').value || '';
-    const customerPhone = document.getElementById('customerPhone').value || '';
+    const customerName = document.getElementById('customerName')?.value || 'Guest Customer';
+    const customerEmail = document.getElementById('customerEmail')?.value || '';
+    const customerPhone = document.getElementById('customerPhone')?.value || '';
 
     const totalAmount = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const orderId = 'ORD-' + Date.now();
 
+    // ✅ Only show loading WHEN clicking checkout, not on page load
     loading.classList.add('active');
     checkoutBtn.disabled = true;
 
+    const orderData = {
+        order_id: orderId,
+        amount: Math.round(totalAmount * 100), // in centavos
+        currency: CURRENCY,
+        description: cart.map(i => `${i.title} ×${i.quantity}`).join(', '),
+        items: cart,
+        customer: {
+            name: customerName,
+            email: customerEmail,
+            phone: customerPhone
+        },
+        success_url: SUCCESS_URL + '?order_id=' + orderId,
+        cancel_url: CANCEL_URL
+    };
+
     try {
-        // Send order to YOUR backend — backend talks to PayMongo
-        const response = await fetch(`${BACKEND_URL}/create-payment`, {
+        console.log("📤 Sending order to webhook:", BACKEND_URL);
+        console.log("Order:", orderData);
+
+        const response = await fetch(BACKEND_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                order_id: orderId,
-                amount: Math.round(totalAmount * 100), // PayMongo uses centavos
-                currency: CURRENCY,
-                description: cart.map(i => `${i.title} ×${i.quantity}`).join(', '),
-                customer: {
-                    name: customerName,
-                    email: customerEmail,
-                    phone: customerPhone
-                },
-                success_url: SUCCESS_URL + '?order_id=' + orderId,
-                cancel_url: CANCEL_URL
-            })
+            body: JSON.stringify(orderData)
         });
 
         const result = await response.json();
 
         if (result.success && result.payment_url) {
-            showToast('✅ Redirecting to payment...', 'success');
+            showToast('✅ Opening payment...', 'success');
+            cart = []; // Clear cart
+            updateCartUI();
+            cartModal.classList.remove('active');
             setTimeout(() => {
                 window.location.href = result.payment_url;
-            }, 1000);
+            }, 800);
         } else {
-            showToast('⚠️ ' + (result.error || 'Failed to create payment'), 'error');
+            showToast('⚠️ ' + (result.error || 'Payment failed'), 'error');
         }
 
     } catch (err) {
-        console.error('Payment Error:', err);
-        showToast('⚠️ Connection error. Please try again.', 'error');
+        console.error('Error:', err);
+        showToast('⚠️ Could not connect. Check your webhook URL.', 'error');
     } finally {
         loading.classList.remove('active');
         checkoutBtn.disabled = false;
