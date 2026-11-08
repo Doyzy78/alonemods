@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout — Select Payment</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="checkout-container">
+        <h2>E-Wallet Checkout</h2>
+        
+        <div class="order-card">
+            <h3>Order Summary</h3>
+            <div id="orderItems"></div>
+            <div class="total-row">
+                <span>Total:</span>
+                <strong id="totalAmount">₱0.00</strong>
+            </div>
+        </div>
+
+        <div class="payment-methods">
+            <h3>Select Payment Method</h3>
+            
+            <label class="payment-option">
+                <input type="radio" name="payment" value="gcash" checked>
+                <span class="pm-card gcash-card">
+                    <span class="pm-icon">💚</span>
+                    <span class="pm-name">GCash</span>
+                </span>
+            </label>
+
+            <label class="payment-option">
+                <input type="radio" name="payment" value="qrph">
+                <span class="pm-card qr-card">
+                    <span class="pm-icon">📱</span>
+                    <span class="pm-name">QR PH</span>
+                </span>
+            </label>
+        </div>
+
+        <div class="billing-form">
+            <h3>Billing Details</h3>
+            <input type="text" id="fullName" placeholder="Full Name" required>
+            <input type="email" id="email" placeholder="Email Address" required>
+            <input type="tel" id="phone" placeholder="Phone Number (e.g. 0917...)" required>
+        </div>
+
+        <button class="pay-btn" onclick="continueToPayment()">Continue</button>
+        <p class="secure-note">🔒 Secured by PayMongo</p>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

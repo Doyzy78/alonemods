@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop — QR PH Payments</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🛒 My Shop</h1>
+            <p class="subtitle">Select items to purchase</p>
+        </header>
+
+        <div class="products-grid" id="productsGrid">
+            <!-- Products loaded by JS -->
+        </div>
+
+        <!-- Cart Summary -->
+        <div class="cart-footer" id="cartFooter" style="display:none;">
+            <div class="cart-info">
+                <span>Total: <strong id="cartTotal">₱0.00</strong></span>
+                <button class="checkout-btn" onclick="goToCheckout()">Proceed to Checkout</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

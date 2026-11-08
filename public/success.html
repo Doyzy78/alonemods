@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Successful</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="success-container">
+        <div class="success-card">
+            <div class="check-icon">✅</div>
+            <h1>Payment Successful!</h1>
+            <p>Thank you for your purchase.</p>
+            <p class="order-ref">Order Reference: <span id="orderRef">—</span></p>
+            <a href="index.html" class="back-btn">Continue Shopping</a>
+        </div>
+    </div>
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        document.getElementById('orderRef').textContent = params.get('order_id') || 'N/A';
+    </script>
+</body>
+</html>

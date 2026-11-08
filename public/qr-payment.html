@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scan QR Code</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="qr-container">
+        <div class="qr-modal">
+            <h2>Scan QR Code to Pay</h2>
+            <p class="qr-subtitle">Scan with any banking or e-wallet app</p>
+            
+            <div class="qr-display">
+                <img id="qrImage" alt="QR Payment Code">
+            </div>
+            
+            <p class="qr-amount">₱<span id="payAmount">0.00</span></p>
+            <p class="ref-label">Reference: <span id="refId">—</span></p>
+
+            <div class="qr-steps">
+                <p><strong>How to pay:</strong></p>
+                <ol>
+                    <li>Open your bank or e-wallet app</li>
+                    <li>Scan the QR code above</li>
+                    <li>Confirm the amount</li>
+                    <li>Enter PIN to complete payment</li>
+                </ol>
+            </div>
+
+            <a href="index.html" class="back-btn">← Cancel & Back to Shop</a>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
