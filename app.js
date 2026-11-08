@@ -1,5 +1,6 @@
 // ============== CONFIGURATION ==============
-const BACKEND_URL = "https://your-backend-url.com"; // ← Replace with your backend URL
+const BACKEND_URL = "https://alonemods.vercel.app";  // Your Vercel backend
+
 const CURRENCY = "PHP";
 const SUCCESS_URL = window.location.origin + "/success.html";
 const CANCEL_URL = window.location.href;
