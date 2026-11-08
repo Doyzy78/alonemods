@@ -1,14 +1,21 @@
+// ==========================================
+// 🔑 UPDATE THIS WITH YOUR RENDER BACKEND URL
+// ==========================================
+// ✅ REPLACE the old API_BASE line with THIS:
+const API_BASE = '/api';  // ✅ Works automatically on Vercel!
+
+// All your fetch calls will now look like this:
+// fetch(`${API_BASE}/create-payment`, ...)
+// fetch(`${API_BASE}/create-qr-payment`, ...)
+
 // ==================== PRODUCTS ====================
 const products = [
     { id: 1, name: 'Coca Cola', desc: 'Ice Cold Cola', price: 2.50 },
     { id: 2, name: 'Pepsi', desc: 'Refreshing Pepsi', price: 2.50 },
-    { id: 3, name: 'Alcohol', desc: '70% Isopropyl Alcohol', price: 25.00 },
-    { id: 4, name: 'Digital Product #1', desc: 'High-quality digital download', price: 150.00 },
-    { id: 5, name: 'Digital Product #2', desc: 'Exclusive content pack', price: 250.00 },
-    { id: 6, name: 'VIP Bundle', desc: 'All-in-one package — Best Value!', price: 499.00 }
+    { id: 3, name: 'Alcohol', desc: '70% Isopropyl Alcohol', price: 25.00 }
 ];
 
-// ==================== CART — Auto Save to LocalStorage ====================
+// ==================== CART — Auto Save ====================
 let cart = JSON.parse(localStorage.getItem('shopCart') || '[]');
 
 function saveCart() {
@@ -19,7 +26,6 @@ function saveCart() {
 function addToProduct(id) {
     const product = products.find(p => p.id === id);
     if (!product) return;
-    
     const existing = cart.find(c => c.id === id);
     if (existing) {
         existing.qty += 1;
@@ -42,20 +48,6 @@ function updateCartUI() {
         const totalEl = document.getElementById('cartTotal');
         if (totalEl) totalEl.textContent = '₱' + total.toFixed(2);
     }
-    
-    // Update product buttons
-    document.querySelectorAll('.product-card').forEach(card => {
-        const pid = parseInt(card.dataset.id);
-        const btn = card.querySelector('.add-cart-btn');
-        const inCart = cart.find(c => c.id === pid);
-            if (inCart) {
-                btn.textContent = '✓ In Cart (' + inCart.qty + ')';
-                btn.classList.add('in-cart');
-            } else {
-                btn.textContent = 'Add to Cart';
-                btn.classList.remove('in-cart');
-            }
-        });
 }
 
 function goToCheckout() {
@@ -67,11 +59,9 @@ function goToCheckout() {
     window.location.href = 'checkout.html';
 }
 
-// ==================== RENDER PRODUCTS ====================
 function renderProducts() {
     const grid = document.getElementById('productsGrid');
     if (!grid) return;
-    
     grid.innerHTML = products.map(p => `
         <div class="product-card" data-id="${p.id}">
             <div class="product-name">${p.name}</div>
@@ -83,15 +73,13 @@ function renderProducts() {
     updateCartUI();
 }
 
-// ==================== CHECKOUT PAGE LOGIC ====================
+// ==================== CHECKOUT ====================
 function loadCheckout() {
     const orderItems = document.getElementById('orderItems');
     const totalAmount = document.getElementById('totalAmount');
     if (!orderItems) return;
-
     const checkoutCart = JSON.parse(localStorage.getItem('checkoutCart') || '[]');
     let total = 0;
-    
     orderItems.innerHTML = checkoutCart.map(item => {
         total += item.price * item.qty;
         return `
@@ -101,7 +89,6 @@ function loadCheckout() {
             </div>
         `;
     }).join('');
-    
     if (totalAmount) totalAmount.textContent = '₱' + total.toFixed(2);
 }
 
@@ -115,19 +102,17 @@ async function continueToPayment() {
         alert('Please fill in all billing details');
         return;
     }
-    
     const checkoutCart = JSON.parse(localStorage.getItem('checkoutCart') || '[]');
     const total = checkoutCart.reduce((sum, item) => sum + (item.price * item.qty), 0);
     const orderId = 'ORD-' + Date.now();
-    
+
     if (method === 'qrph') {
         window.location.href = `qr-payment.html?order_id=${orderId}&amount=${Math.round(total * 100)}&name=${encodeURIComponent(fullName)}&phone=${encodeURIComponent(phone)}`;
         return;
     }
-    
-    // GCash — Create Payment Link
+
     try {
-        const res = await fetch('/create-payment', {
+        const res = await fetch(`${API_BASE}/create-payment`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -139,10 +124,10 @@ async function continueToPayment() {
                 cancel_url: `${window.location.origin}/index.html`
             })
         });
-        
+
         const result = await res.json();
         if (result.success && result.payment_url) {
-            localStorage.removeItem('shopCart'); // Clear cart on success
+            localStorage.removeItem('shopCart');
             window.location.href = result.payment_url;
         } else {
             alert('Error: ' + (result.error || 'Failed to create payment'));
@@ -153,22 +138,22 @@ async function continueToPayment() {
     }
 }
 
-// ==================== QR PAYMENT PAGE LOGIC ====================
+// ==================== QR PAYMENT PAGE ====================
 async function loadQRPayment() {
     const params = new URLSearchParams(window.location.search);
     const amount = parseInt(params.get('amount') || '0') / 100;
     const orderId = params.get('order_id');
     const phone = params.get('phone') || '';
-    
+
     const amountEl = document.getElementById('payAmount');
     const refIdEl = document.getElementById('refId');
     const qrImageEl = document.getElementById('qrImage');
-    
+    const loadingEl = document.getElementById('qrLoading');
+
     if (amountEl) amountEl.textContent = amount.toFixed(2);
-    if (refIdEl) refIdEl.textContent = orderId;
-    
+
     try {
-        const res = await fetch('/create-qr-payment', {
+        const res = await fetch(`${API_BASE}/create-qr-payment`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -177,11 +162,17 @@ async function loadQRPayment() {
                 mobile_number: phone
             })
         });
-        
+
         const result = await res.json();
         if (result.success && result.qr_image) {
-            if (qrImageEl) qrImageEl.src = result.qr_image;
-            if (refIdEl && result.reference_id) refIdEl.textContent = result.reference_id;
+            if (loadingEl) loadingEl.style.display = 'none';
+            if (qrImageEl) {
+                qrImageEl.src = result.qr_image;
+                qrImageEl.style.display = 'block';
+            }
+            if (refIdEl && result.reference_id) {
+                refIdEl.textContent = result.reference_id;
+            }
         } else {
             alert('QR Error: ' + (result.error || 'Could not generate QR'));
         }
@@ -197,5 +188,3 @@ window.addEventListener('DOMContentLoaded', () => {
     if (document.getElementById('orderItems')) loadCheckout();
     if (document.getElementById('qrImage')) loadQRPayment();
 });
-
-           
