@@ -87,8 +87,8 @@ app.post('/webhook/paymongo', async (req, res) => {
         const event = req.body.data;
         console.log("📥 Webhook Event Received:", event.type);
 
-        // ✅ Payment was successful!
-        if (event.type === 'link.payment.paid' || event.type === 'checkout_session.payment.paid') {
+        // ✅ PAYMENT SUCCESS — Your webhook uses "payment.paid"
+        if (event.type === 'payment.paid') {
             const paymentData = event.data.attributes;
             console.log("=====================================");
             console.log("✅ PAYMENT SUCCESSFUL!");
@@ -97,15 +97,14 @@ app.post('/webhook/paymongo', async (req, res) => {
             console.log("Description:", paymentData.description || 'N/A');
             console.log("=====================================");
             
-            // ✅ HERE — Your action when payment is confirmed:
+            // ✅ YOUR CODE HERE — Payment confirmed!
             // - Update database: mark order as PAID
-            // - Send email/download link to customer
-            // - Notify yourself via Telegram/Discord
+            // - Send download link to customer email
         }
 
-        // Payment failed or expired
-        if (event.type === 'link.payment.failed') {
-            console.log("❌ Payment failed");
+        // ❌ PAYMENT FAILED
+        if (event.type === 'payment.failed') {
+            console.log("❌ Payment failed — Reference:", event.data.attributes.id);
         }
 
         res.status(200).send('OK');
@@ -118,14 +117,13 @@ app.post('/webhook/paymongo', async (req, res) => {
 
 // Health check
 app.get('/', (req, res) => {
-    res.send('✅ Alonemods PayMongo Backend Running — Webhook Ready');
+    res.send('✅ Alonemods PayMongo Backend — Webhook: payment.paid, payment.failed');
 });
 
 app.listen(PORT, () => {
     console.log("=====================================");
     console.log(`🚀 Server running on port ${PORT}`);
-    console.log(`📡 Webhook URL: ${FRONTEND_URL}/webhook/paymongo`);
-    console.log(`💳 Create Payment: ${FRONTEND_URL}/create-payment`);
+    console.log(`📡 Webhook: ${FRONTEND_URL}/webhook/paymongo`);
+    console.log("✅ Listening: payment.paid, payment.failed");
     console.log("=====================================");
 });
-
