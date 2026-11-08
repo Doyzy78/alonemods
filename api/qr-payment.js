@@ -1,6 +1,7 @@
 const fetch = require('node-fetch');
 
-const PAYMONGO_SECRET_KEY = process.env.PAYMONGO_SECRET_KEY;
+// ✅ Key built-in — no .env file needed
+const PAYMONGO_SECRET_KEY = 'sk_test_1WYGzCS9CKwNLbZsETvpiz1o';
 
 function getAuthHeader() {
   return 'Basic ' + Buffer.from(PAYMONGO_SECRET_KEY + ':').toString('base64');
